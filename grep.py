@@ -30,14 +30,15 @@ class Jenkins:
         if initial_value:
             return initial_value
 
-        queried_data = self._queried_data
-        url = self._url
-
-        if not queried_data:
-            if not url:
+        if not self._queried_data:
+            if not self._url:
                 return None
-            self._queried_data = queried_data = self.get_json()
-        value = queried_data.get(name)
+            self._queried_data = self.request_json()
+
+        return self.__get_child(name)
+
+    def __get_child(self, name):
+        value = self._queried_data.get(name)
         if type(value) == list:
             return [Jenkins(initial_data=item) for item in value]
         elif value:
@@ -53,11 +54,11 @@ class Jenkins:
             return self._url + relative_url
         return self._url
 
-    def get_raw(self, relative_url):
-        return request.urlopen(self._url + relative_url).read().decode()
+    def request_json(self, relative_url='api/json'):
+        return json.loads(self.request(relative_url))
 
-    def get_json(self, relative_url='api/json'):
-        return json.loads(self.get_raw(relative_url))
+    def request(self, relative_url):
+        return request.urlopen(self._url + relative_url).read().decode()
 
 
 
@@ -69,7 +70,7 @@ def main():
     for view_url in view_urls:
         for job in recursive_jobs(Jenkins(view_url)):
             for build in job.builds or []:
-                console_text = build.get_raw('consoleText')
+                console_text = build.request('consoleText')
                 line_number = 0
                 for line in console_text.splitlines():
                     line_number += 1
