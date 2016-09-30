@@ -3,7 +3,8 @@
 Usage: ./grep.py [options] <pattern> <view> ...
 
 Options:
--l      Write only the urls of logs containing selected lines.
+--urls-only      Write only the urls of logs containing selected lines.
+--no-urls        Suppress the prefixing of urls on output.
 """
 import json
 import docopt
@@ -64,7 +65,6 @@ class Jenkins:
 
 def main():
     arguments = docopt.docopt(__doc__)
-    files_only = arguments.get('-l')
     pattern = re.compile(arguments['<pattern>'])
     view_urls = arguments['<view>']
     for view_url in view_urls:
@@ -75,9 +75,11 @@ def main():
                 for line in console_text.splitlines():
                     line_number += 1
                     if pattern.search(line):
-                        if files_only:
+                        if arguments.get('--urls-only'):
                             print(build.url('consoleText'))
                             break
+                        elif arguments.get('--no-urls'):
+                            print(line)
                         else:
                             print('{}:{}: {}'.format(build.url('consoleText'), line_number, line))
 
