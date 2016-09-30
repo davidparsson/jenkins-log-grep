@@ -4,6 +4,7 @@ Usage: ./grep.py [options] <pattern> <view> ...
 
 Options:
 --urls-only      Write only the urls of logs containing selected lines.
+--jobs-only      Write only the urls of jobs having logs containing selected lines.
 --no-urls        Suppress the prefixing of urls on output.
 """
 import json
@@ -34,7 +35,7 @@ class Jenkins:
         if not self._queried_data:
             if not self._url:
                 return None
-            self._queried_data = self.request_json()
+            self._queried_data = self.get_json()
 
         return self.__get_child(name)
 
@@ -50,15 +51,15 @@ class Jenkins:
     def __repr__(self):
         return "<Jenkins {}>".format(repr(self._initial_data))
 
-    def url(self, relative_url=None):
+    def get_url(self, relative_url=None):
         if relative_url:
             return self._url + relative_url
         return self._url
 
-    def request_json(self, relative_url='api/json'):
-        return json.loads(self.request(relative_url))
+    def get_json(self, relative_url='api/json'):
+        return json.loads(self.get_raw(relative_url))
 
-    def request(self, relative_url):
+    def get_raw(self, relative_url):
         return request.urlopen(self._url + relative_url).read().decode()
 
 
@@ -70,18 +71,31 @@ def main():
     for view_url in view_urls:
         for job in recursive_jobs(Jenkins(view_url)):
             for build in job.builds or []:
-                console_text = build.request('consoleText')
+                console_text = build.get_raw('consoleText')
                 line_number = 0
+                one_per_job = False
                 for line in console_text.splitlines():
                     line_number += 1
                     if pattern.search(line):
+                        one_per_build = False
                         if arguments.get('--urls-only'):
-                            print(build.url('consoleText'))
-                            break
+                            line_format = '{console_url}'
+                            one_per_build = True
                         elif arguments.get('--no-urls'):
-                            print(line)
+                            line_format = '{line}'
+                        elif arguments.get('--jobs-only'):
+                            line_format = '{job_url}'
+                            one_per_job = True
                         else:
-                            print('{}:{}: {}'.format(build.url('consoleText'), line_number, line))
+                            line_format = '{console_url}:{line_number}: {line}'
+                        print(line_format.format(job_url=job.get_url(),
+                                                 console_url=build.get_url('consoleText'),
+                                                 line_number=line_number,
+                                                 line=line))
+                        if one_per_build or one_per_job:
+                            break
+                if one_per_job:
+                    break
 
 
 def recursive_jobs(jenkins):
