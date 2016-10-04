@@ -18,31 +18,35 @@ def main():
     view_urls = arguments['<view>']
     for view_url in view_urls:
         for job in recursive_jobs(jenkins.Jenkins(view_url)):
-            for build in job.builds or []:
-                console_text = build.get_raw('consoleText')
-                line_number = 0
-                one_per_job = False
-                for line in console_text.splitlines():
-                    line_number += 1
-                    if pattern.search(line):
-                        one_per_build = False
-                        if arguments.get('--urls-only'):
-                            line_format = '{console_url}'
-                            one_per_build = True
-                        elif arguments.get('--no-urls'):
-                            line_format = '{line}'
-                        elif arguments.get('--jobs-only'):
-                            line_format = '{job_url}'
-                            one_per_job = True
-                        else:
-                            line_format = '{console_url}:{line_number}: {line}'
-                        print(line_format.format(job_url=job.get_url(),
-                                                 console_url=build.get_url('consoleText'),
-                                                 line_number=line_number,
-                                                 line=line))
-                        if one_per_build or one_per_job:
-                            break
+            grep_builds(arguments, pattern, job)
+
+
+def grep_builds(arguments, pattern, job):
+    for build in job.builds or []:
+        console_text = build.get_raw('consoleText')
+        line_number = 0
+        one_per_job = False
+        for line in console_text.splitlines():
+            line_number += 1
+            if pattern.search(line):
+                one_per_build = False
+                if arguments.get('--urls-only'):
+                    line_format = '{console_url}'
+                    one_per_build = True
+                elif arguments.get('--no-urls'):
+                    line_format = '{line}'
+                elif arguments.get('--jobs-only'):
+                    line_format = '{job_url}'
+                    one_per_job = True
+                else:
+                    line_format = '{console_url}:{line_number}: {line}'
+                print(line_format.format(job_url=job.get_url(),
+                                         console_url=build.get_url('consoleText'),
+                                         line_number=line_number,
+                                         line=line))
                 if one_per_job:
+                    return
+                elif one_per_build:
                     break
 
 
