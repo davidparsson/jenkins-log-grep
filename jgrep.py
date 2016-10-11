@@ -1,11 +1,14 @@
 #!/usr/bin/env python3
 """
-Usage: ./jgrep.py [options] <pattern> <view> ...
+Usage: ./jgrep.py [options] <pattern> <url> ...
+
+<pattern>       A regular expression to look for in the logs.
+<url>           The URL of a Job or a View in Jenkins.
 
 Options:
---urls-only      Write only the urls of logs containing selected lines.
---jobs-only      Write only the urls of jobs having logs containing selected lines.
---no-urls        Suppress the prefixing of urls on output.
+--urls-only     Write only the urls of logs containing selected lines.
+--jobs-only     Write only the urls of jobs having logs containing selected lines.
+--no-urls       Suppress the prefixing of urls on output.
 """
 import docopt
 import re
@@ -15,9 +18,9 @@ import jenkins
 def main():
     arguments = docopt.docopt(__doc__)
     pattern = re.compile(arguments['<pattern>'])
-    view_urls = arguments['<view>']
-    for view_url in view_urls:
-        for job in recursive_jobs(jenkins.Jenkins(view_url)):
+    urls = arguments['<url>']
+    for url in urls:
+        for job in recursive_jobs(jenkins.Jenkins(url)):
             grep_builds(arguments, pattern, job)
 
 
@@ -50,9 +53,12 @@ def grep_builds(arguments, pattern, job):
                     break
 
 
-def recursive_jobs(jenkins):
-    for job in jenkins.jobs or []:
-        yield job
+def recursive_jobs(job_or_view):
+    if job_or_view.builds:
+        yield job_or_view
+    for job in job_or_view.jobs or []:
+        if job.builds:
+            yield job
         for child_job in recursive_jobs(job):
             yield child_job
 
