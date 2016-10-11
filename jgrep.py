@@ -7,6 +7,7 @@ Usage: ./jgrep.py [options] <pattern> <url> ...
 
 Options:
 --urls-only     Write only the urls of logs containing selected lines.
+--builds-only   Write only the urls of builds having logs containing selected lines.
 --jobs-only     Write only the urls of jobs having logs containing selected lines.
 --no-urls       Suppress the prefixing of urls on output.
 """
@@ -36,6 +37,9 @@ def grep_builds(arguments, pattern, job):
                 if arguments.get('--urls-only'):
                     line_format = '{console_url}'
                     one_per_build = True
+                elif arguments.get('--builds-only'):
+                    line_format = '{build_url}'
+                    one_per_build = True
                 elif arguments.get('--no-urls'):
                     line_format = '{line}'
                 elif arguments.get('--jobs-only'):
@@ -45,6 +49,7 @@ def grep_builds(arguments, pattern, job):
                     line_format = '{console_url}:{line_number}: {line}'
                 print(line_format.format(job_url=job.get_url(),
                                          console_url=build.get_url('consoleText'),
+                                         build_url=build.get_url(),
                                          line_number=line_number,
                                          line=line))
                 if one_per_job:
