@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Usage: ./grep.py [options] <pattern> <view> ...
+Usage: ./jgrep.py [options] <pattern> <view> ...
 
 Options:
 --urls-only      Write only the urls of logs containing selected lines.
