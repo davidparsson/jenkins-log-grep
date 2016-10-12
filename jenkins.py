@@ -24,7 +24,7 @@ class Jenkins:
         if not self._queried_data:
             if not self._url:
                 return None
-            self._queried_data = self.get_json()
+            self._queried_data = self.request_json()
 
         return self.__get_child(name)
 
@@ -45,8 +45,8 @@ class Jenkins:
             return self._url + relative_url
         return self._url
 
-    def get_json(self, relative_url='api/json'):
-        return json.loads(self.get_raw(relative_url))
+    def request_json(self, relative_url='api/json'):
+        return json.loads(self.request(relative_url))
 
-    def get_raw(self, relative_url):
+    def request(self, relative_url):
         return request.urlopen(self._url + relative_url).read().decode()

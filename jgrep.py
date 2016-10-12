@@ -27,7 +27,7 @@ def main():
 
 def grep_builds(arguments, pattern, job):
     for build in job.builds or []:
-        console_text = build.get_raw('consoleText')
+        console_text = build.request('consoleText')
         line_number = 0
         one_per_job = False
         for line in console_text.splitlines():
