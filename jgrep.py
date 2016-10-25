@@ -66,4 +66,7 @@ def recursive_jobs(job_or_view):
             yield child_job
 
 if __name__ == '__main__':
-    main()
+    try:
+        main()
+    except KeyboardInterrupt:
+        pass
