@@ -62,8 +62,6 @@ def recursive_jobs(job_or_view):
     if job_or_view.builds:
         yield job_or_view
     for job in job_or_view.jobs or []:
-        if job.builds:
-            yield job
         for child_job in recursive_jobs(job):
             yield child_job
 
