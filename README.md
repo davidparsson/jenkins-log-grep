@@ -22,7 +22,7 @@ Full usage:
     <url>           The URL of a Job or a View in Jenkins.
 
     Options:
-    --urls-only     Write only the urls of logs containing selected lines.
-    --builds-only   Write only the urls of builds having logs containing selected lines.
-    --jobs-only     Write only the urls of jobs having logs containing selected lines.
+    --urls-only     Prints only the urls of logs containing selected lines.
+    --builds-only   Prints only the urls of builds having logs containing selected lines.
+    --jobs-only     Prints only the urls of jobs having logs containing selected lines.
     --no-urls       Suppress the prefixing of urls on output.
