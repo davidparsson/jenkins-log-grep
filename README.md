@@ -3,8 +3,8 @@ Jenkins Log Grep
 
 Greps for expressions in Jenkins logs.
 
-Usage
------
+Example
+-------
 Run by providing a regular expression and one or more Jenkins URLs:
 
     $ ./jgrep.py 'Building in workspace' http://jenkins/
@@ -14,7 +14,9 @@ Run by providing a regular expression and one or more Jenkins URLs:
     http://jenkins/job/second_job/2/consoleText:2: Building in workspace /var/lib/jenkins/workspace/second_job
     http://jenkins/job/second_job/1/consoleText:2: Building in workspace /var/lib/jenkins/workspace/second_job
 
-Full usage:
+
+Full usage
+----------
 
     Usage: ./jgrep.py [options] <pattern> <url> ...
 
