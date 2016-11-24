@@ -48,7 +48,7 @@ def grep_builds(arguments, pattern, job):
                     line_format = '{job_url}'
                     one_per_job = True
                 else:
-                    line_format = '{console_url}:{line_number}: {line}'
+                    line_format = '{console_url}#{line_number}: {line}'
                 print(line_format.format(job_url=job.get_url(),
                                          console_url=build.get_url('consoleText'),
                                          build_url=build.get_url(),
