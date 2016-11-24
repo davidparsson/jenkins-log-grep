@@ -62,15 +62,21 @@ def recursive_jobs(job_or_view):
     jobs = set()
     if job_or_view.builds:
         jobs.add(job_or_view)
+        yield job_or_view
     for job in job_or_view.jobs or []:
-        for child_job in recursive_jobs(job):
-            jobs.add(child_job)
+        for child_job in unique(recursive_jobs(job), jobs):
+            yield child_job
     for view in job_or_view.views or []:
         if view.get_url() != job_or_view.get_url():
-            for child_job in recursive_jobs(view):
-                jobs.add(child_job)
-    for child_job in sorted(jobs):
-        yield child_job
+            for child_job in unique(recursive_jobs(view), jobs):
+                yield child_job
+
+
+def unique(items, previous_items):
+    for item in items:
+        if item not in previous_items:
+            previous_items.add(item)
+            yield item
 
 
 if __name__ == '__main__':
