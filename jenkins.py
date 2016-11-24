@@ -50,3 +50,12 @@ class Jenkins:
 
     def request(self, relative_url):
         return request.urlopen(self._url + relative_url).read().decode()
+
+    def __eq__(self, other):
+        return type(self) == type(other) and self.get_url() == other.get_url()
+
+    def __hash__(self):
+        return hash(self.get_url())
+
+    def __lt__(self, other):
+        return self.get_url() < other.get_url()
