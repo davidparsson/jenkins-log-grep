@@ -6,10 +6,11 @@ Usage: ./jgrep.py [options] <pattern> <url> ...
 <url>           The URL of a Job or a View in Jenkins.
 
 Options:
---urls-only     Prints only the urls of logs containing selected lines.
---builds-only   Prints only the urls of builds having logs containing selected lines.
---jobs-only     Prints only the urls of jobs having logs containing selected lines.
---no-urls       Suppress the prefixing of urls on output.
+--urls-only         Prints only the urls of logs containing selected lines.
+--builds-only       Prints only the urls of builds having logs containing selected lines.
+--jobs-only         Prints only the urls of jobs having logs containing selected lines.
+--no-urls           Suppress the prefixing of urls on output.
+--include-disabled  Include disabled jobs.
 """
 import docopt
 import re
@@ -22,7 +23,8 @@ def main():
     urls = arguments['<url>']
     for url in urls:
         for job in recursive_jobs(jenkins.Jenkins(url)):
-            grep_builds(arguments, pattern, job)
+            if arguments['--include-disabled'] or job.color != 'disabled':
+                grep_builds(arguments, pattern, job)
 
 
 def grep_builds(arguments, pattern, job):
