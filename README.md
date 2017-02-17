@@ -9,7 +9,7 @@ Installation
 
 Requires Python 3. Install dependencies using:
 
-    $ pip install -r requirements.txt
+    $ pip3 install -r requirements.txt
 
 
 Example
