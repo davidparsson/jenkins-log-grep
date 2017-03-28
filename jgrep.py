@@ -11,8 +11,10 @@ Options:
 --jobs-only         Prints only the urls of jobs having logs containing selected lines.
 --no-urls           Suppress the prefixing of urls on output.
 --include-disabled  Include disabled jobs.
+--timestamps        Prints the build time.
 """
 import re
+from datetime import datetime
 
 import docopt
 
@@ -38,6 +40,7 @@ def grep_builds(arguments, pattern, job):
             line_number += 1
             if pattern.search(line):
                 one_per_build = False
+                timestamp = None
                 if arguments.get('--urls-only'):
                     line_format = '{console_url}'
                     one_per_build = True
@@ -51,11 +54,16 @@ def grep_builds(arguments, pattern, job):
                     one_per_job = True
                 else:
                     line_format = '{console_url}#{line_number}: {line}'
+
+                if arguments.get('--timestamps'):
+                    line_format = '[{timestamp}] ' + line_format
+                    timestamp = datetime.fromtimestamp(build.timestamp // 1000)
                 print(line_format.format(job_url=job.get_url(),
                                          console_url=build.get_url('consoleText'),
                                          build_url=build.get_url(),
                                          line_number=line_number,
-                                         line=line))
+                                         line=line,
+                                         timestamp=timestamp))
                 if one_per_job:
                     return
                 elif one_per_build:
