@@ -30,12 +30,15 @@ class Jenkins:
 
     def __get_child(self, name):
         value = self._queried_data.get(name)
+        return self.__wrap_value(value)
+
+    def __wrap_value(self, value):
         if type(value) == list:
-            return [Jenkins(initial_data=item) for item in value]
-        elif value:
+            return [self.__wrap_value(item) for item in value]
+        elif type(value) == dict:
             return Jenkins(initial_data=value)
         else:
-            return None
+            return value
 
     def __repr__(self):
         return "<Jenkins {}>".format(repr(self._initial_data))
