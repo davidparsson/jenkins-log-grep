@@ -12,8 +12,10 @@ Options:
 --no-urls           Suppress the prefixing of urls on output.
 --include-disabled  Include disabled jobs.
 """
-import docopt
 import re
+
+import docopt
+
 import jenkins
 
 
